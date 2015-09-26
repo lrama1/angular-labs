@@ -25,7 +25,7 @@ public class RegExTester {
 			"	)();";
 
 			
-	public void appendNewRouteExpression(String newWhenExpression){
+	public String appendNewRouteExpression(String newWhenExpression){
 		String whenRegex = "\\.when\\((.*?)\\)(\\;)*";
 		Pattern whenPattern = Pattern.compile(whenRegex, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 		//String value = routePattern.matcher(routerString).
@@ -33,10 +33,13 @@ public class RegExTester {
 		Matcher matcher = whenPattern.matcher(routerString);	
 		StringWriter whenWriter = new StringWriter();
 		//1.  gather all 'when' expressions
+
 		while(matcher.find()){
 			System.out.println("===========>" + matcher.group());
 			whenWriter.append("\n" + matcher.group());
 		}
+		routerString = matcher.replaceAll("INSERTHEREPLEASE");
+		
 		
 		//2.  obtain the 'otherwise' expression (IF IT EXISTS)
 		String otherwiseRegex = "\\.otherwise\\((.*?)\\)(\\;)*";
@@ -47,12 +50,20 @@ public class RegExTester {
 			System.out.println("OTHERWISE EXPR===========>" + otherwiseMatcher.group());
 			otherwiseWriter.append(otherwiseMatcher.group());
 		}
+		routerString = otherwiseMatcher.replaceAll("INSERTHEREPLEASE");
 		
 		//append the new route to the list of 'WHEN' EXPRESSIONS 
 		whenWriter.append("\n" + newWhenExpression);
 		
 		System.out.println("=================================================================================");
-		System.out.println(whenWriter.toString());
+		System.out.println(whenWriter.toString() + " " +  otherwiseWriter.toString());
+		
+		System.out.println("=================================================================================");
+		int insertionPoint = routerString.indexOf("INSERTHEREPLEASE");
+		StringBuffer stringBuffer = new StringBuffer(routerString);
+		stringBuffer.insert(insertionPoint, whenWriter.toString() + " " +  otherwiseWriter.toString());
+		
+		return stringBuffer.toString().replaceAll("INSERTHEREPLEASE", "");
 		
 	}
 
@@ -62,7 +73,7 @@ public class RegExTester {
 		
 		String whenExprToAdd = ".when('/view3', {controller : 'VehicleController', templateUrl : '/test-web1/resources/js/angular_templates/view3.html'})";
 		
-		regExTester.appendNewRouteExpression(whenExprToAdd);
+		System.out.println(regExTester.appendNewRouteExpression(whenExprToAdd));
 	}
 
 }
